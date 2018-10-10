@@ -38,31 +38,6 @@ while not OpenList.empty():
         if temp.x >= 0 & temp.x < N & temp.y >= 0 & temp.y < N:
             successors.append(temp)
 
-    # if (q.x-1) >= 0 & (q.y+1) < N:
-    #     temp = Cell(q.x-1, q.y-1)
-    #     successors.append(temp)
-    # if (q.y+1) < N:
-    #     temp = Cell(q.x, q.y+1)
-    #     successors.append(temp)
-    # if (q.x+1) < N & (q.y+1) < N:
-    #     temp = Cell(q.x+1, q.y+1)
-    #     successors.append(temp)
-    # if (q.x+1) < N:
-    #     temp = Cell(q.x+1, q.y)
-    #     successors.append(temp)
-    # if (q.x+1) < N & (q.y-1) >= 0:
-    #     temp = Cell(q.x+1, q.y-1)
-    #     successors.append(temp)
-    # if (q.y-1) >= 0:
-    #     temp = Cell(q.x, q.y-1)
-    #     successors.append(temp)
-    # if (q.x-1) >= 0 & (q.y-1) >= 0:
-    #     temp = Cell(q.x-1, q.y-1)
-    #     successors.append(temp)
-    # if (q.x-1) >= 0:
-    #     temp = Cell(q.x-1, q.y)
-    #     successors.append(temp)
-
     for s in successors:
         # Check if this successor is goal
         if (s.x == goal.x & s.y == goal.y):
