@@ -28,42 +28,48 @@ ClosedList = PriorityQueue()
 OpenList.put(start)
 
 while not OpenList.empty():
+    sx = [-1, 0, 1, 1, 1, 0, -1, -1]
+    sy = [1, 1, 1, 0, -1, -1, -1, 0]
     q = OpenList.get()
     successors = []
 
-    if (q.x-1) >= 0 & (q.y+1) < N:
-        temp = Cell(q.x-1, q.y-1)
-        successors.append(temp)
-    if (q.y+1) < N:
-        temp = Cell(q.x, q.y+1)
-        successors.append(temp)
-    if (q.x+1) < N & (q.y+1) < N:
-        temp = Cell(q.x+1, q.y+1)
-        successors.append(temp)
-    if (q.x+1) < N:
-        temp = Cell(q.x+1, q.y)
-        successors.append(temp)
-    if (q.x+1) < N & (q.y-1) >= 0:
-        temp = Cell(q.x+1, q.y-1)
-        successors.append(temp)
-    if (q.y-1) >= 0:
-        temp = Cell(q.x, q.y-1)
-        successors.append(temp)
-    if (q.x-1) >= 0 & (q.y-1) >= 0:
-        temp = Cell(q.x-1, q.y-1)
-        successors.append(temp)
-    if (q.x-1) >= 0:
-        temp = Cell(q.x-1, q.y)
-        successors.append(temp)
+    for i in range(8):
+        temp = Cell(q.x+sx, q.y+sy)
+        if temp.x >= 0 & temp.x < N & temp.y >= 0 & temp.y < N:
+            successors.append(temp)
+
+    # if (q.x-1) >= 0 & (q.y+1) < N:
+    #     temp = Cell(q.x-1, q.y-1)
+    #     successors.append(temp)
+    # if (q.y+1) < N:
+    #     temp = Cell(q.x, q.y+1)
+    #     successors.append(temp)
+    # if (q.x+1) < N & (q.y+1) < N:
+    #     temp = Cell(q.x+1, q.y+1)
+    #     successors.append(temp)
+    # if (q.x+1) < N:
+    #     temp = Cell(q.x+1, q.y)
+    #     successors.append(temp)
+    # if (q.x+1) < N & (q.y-1) >= 0:
+    #     temp = Cell(q.x+1, q.y-1)
+    #     successors.append(temp)
+    # if (q.y-1) >= 0:
+    #     temp = Cell(q.x, q.y-1)
+    #     successors.append(temp)
+    # if (q.x-1) >= 0 & (q.y-1) >= 0:
+    #     temp = Cell(q.x-1, q.y-1)
+    #     successors.append(temp)
+    # if (q.x-1) >= 0:
+    #     temp = Cell(q.x-1, q.y)
+    #     successors.append(temp)
 
     for s in successors:
         # Check if this successor is goal
         if (s.x == goal.x & s.y == goal.y):
-            break
+            return
         else:
             # Compute g (distance between successor and q)
             s.g += 1
             # Compute h (distance from goal to successor) and f
             s.compute_h_f(goal)
         elif:
-            
