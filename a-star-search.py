@@ -67,9 +67,6 @@ def a_star_search(grid, start, goal):
                     temp.g += 1
                     temp.compute_h_f(goal)
 
-
-
-                    
                 successors.append(temp)
 
         for s in successors:
