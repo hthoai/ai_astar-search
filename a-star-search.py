@@ -21,7 +21,7 @@ class Cell:
 
     def __lt__(self, other):
         return self.f < other.f
-        
+
 
 N = 7
 grid = [[0 for x in range(N)] for y in range(N)]
@@ -29,7 +29,7 @@ grid = [[0 for x in range(N)] for y in range(N)]
 grid[0][6] = grid[1][5] = grid[1][6] = 1
 grid[2][0] = grid[2][1] = grid[2][6] = 1
 grid[3][1] = grid[3][2] = grid[4][1] = grid[4][2] = 1
-grid[4][5] = grid[5][1] = grid[5][5] = 1
+grid[4][5] = grid[5][1] = grid[5][5] = grid[6][5] = 1
 
 start = Cell(0, 0)
 goal = Cell(6, 6)
@@ -82,10 +82,12 @@ def a_star_search(grid, start, goal):
                             if (grid[i][j] == 1):
                                 maps[i][j] = 'o'
 
-                    while (u != start.x | v != start.y):
-                        road.append(u, v)
-                        u = goal.parent.x
-                        v = goal.parent.y
+                    while (u != start.x or v != start.y):
+                        t = (u, v)
+                        temp = temp.parent
+                        road.append(t)
+                        u = temp.x
+                        v = temp.y
 
                     for i in range(len(road)):
                         temp = road.pop()
@@ -101,7 +103,7 @@ def a_star_search(grid, start, goal):
 
                     return
 
-                elif (ClosedList[temp.x][temp.y] == False) & (grid[temp.x][temp.y] == 0):
+                elif (ClosedList[temp.x][temp.y] == False) and (grid[temp.x][temp.y] == 0):
                     temp.g = q.g+1
                     temp.compute_h_f(goal)
 
