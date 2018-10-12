@@ -79,12 +79,13 @@ def a_star_search(outfile, grid, N, start, goal):
                     outfile.write('%d\n' % len(road))
 
                     for i in range(len(road)):
-                        temp = road.pop()
-                        maps[temp[0]][temp[1]] = 'x'
-                        outfile.write('(%d, %d) ' % (temp[0], temp[1])
+                        t = road.pop()
+                        maps[t[0]][t[1]] = 'x'
+                        outfile.write('(%d, %d) ' % (t[0], t[1]))
+                    outfile.write('\n')
 
-                    maps[start.x][start.y]='S'
-                    maps[goal.x][goal.y]='G'
+                    maps[start.x][start.y] = 'S'
+                    maps[goal.x][goal.y] = 'G'
 
                     for i in range(N):
                         for j in range(N):
@@ -94,27 +95,28 @@ def a_star_search(outfile, grid, N, start, goal):
                     return
 
                 elif (ClosedList[temp.x][temp.y] == False) and (grid[temp.x][temp.y] == 0):
-                    temp.g=q.g+1
+                    temp.g = q.g+1
                     temp.compute_h_f(goal)
 
                     if temp.parent_f == float('inf') or temp.parent_f > temp.f:
-                        temp.parent_f=temp.f
+                        temp.parent_f = temp.f
                         temp.set_parent(q)
                         OpenList.put(temp)
 
     if found_goal == False:
         outfile.write('-1')
 
+
 if __name__ == '__main__':
     with open(sys.argv[1]) as f:
-        N=int(next(f))
-        start_x, start_y=[int(x)for x in next(f).split()]
-        goal_x, goal_y=[int(x)for x in next(f).split()]
-        grid=[[int(x)for x in line.split()]for line in f]
+        N = int(next(f))
+        start_x, start_y = [int(x)for x in next(f).split()]
+        goal_x, goal_y = [int(x)for x in next(f).split()]
+        grid = [[int(x)for x in line.split()]for line in f]
 
-    start=Cell(start_x, start_y)
-    goal=Cell(goal_x, goal_y)
+    start = Cell(start_x, start_y)
+    goal = Cell(goal_x, goal_y)
 
-    outfile=open(sys.argv[2], 'w')
+    outfile = open(sys.argv[2], 'w')
 
     a_star_search(outfile, grid, N, start, goal)
