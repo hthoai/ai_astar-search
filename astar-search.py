@@ -1,3 +1,4 @@
+import sys
 from queue import PriorityQueue
 from math import sqrt
 
@@ -23,31 +24,15 @@ class Cell:
         return self.f < other.f
 
 
-N = 7
-grid = [[0 for x in range(N)] for y in range(N)]
-
-grid[0][6] = grid[1][5] = grid[1][6] = 1
-grid[2][0] = grid[2][1] = grid[2][6] = 1
-grid[3][1] = grid[3][2] = grid[4][1] = grid[4][2] = 1
-grid[4][5] = grid[5][1] = grid[5][5] = grid[6][5] = 1
-
-start = Cell(0, 0)
-goal = Cell(6, 6)
-
-
-def is_in_bounds(row, col):
+def is_in_bounds(row, col, N):
     return (row >= 0) & (row < N) & (col >= 0) & (col < N)
-
-
-def is_blocked(row, col, grid):
-    return grid[row][col] == 1
 
 
 def is_destination(row, col, goal):
     return row == goal.x & col == goal.y
 
 
-def a_star_search(grid, start, goal):
+def a_star_search(outfile, grid, N, start, goal):
     # Create a closed list and initialise it to false
     # which means that no cell has been included yet
     ClosedList = [[False for x in range(N)] for y in range(N)]
@@ -64,7 +49,7 @@ def a_star_search(grid, start, goal):
 
         for i in range(8):
             # Check if this successor is in bounds
-            if is_in_bounds(q.x+sx[i], q.y+sy[i]) == True:
+            if is_in_bounds(q.x+sx[i], q.y+sy[i], N) == True:
                 temp = Cell(q.x+sx[i], q.y+sy[i])
 
                 # Check if this successor is destination
@@ -88,32 +73,48 @@ def a_star_search(grid, start, goal):
                         road.append(t)
                         u = temp.x
                         v = temp.y
+                    t = (start.x, start.y)
+                    road.append(t)
+
+                    outfile.write('%d\n' % len(road))
 
                     for i in range(len(road)):
                         temp = road.pop()
                         maps[temp[0]][temp[1]] = 'x'
+                        outfile.write('(%d, %d) ' % (temp[0], temp[1])
 
-                    maps[start.x][start.y] = 'S'
-                    maps[goal.x][goal.y] = 'G'
+                    maps[start.x][start.y]='S'
+                    maps[goal.x][goal.y]='G'
 
                     for i in range(N):
                         for j in range(N):
-                            print(maps[i][j], end='')
-                        print()
+                            outfile.write('%c ' % maps[i][j])
+                        outfile.write('\n')
 
                     return
 
                 elif (ClosedList[temp.x][temp.y] == False) and (grid[temp.x][temp.y] == 0):
-                    temp.g = q.g+1
+                    temp.g=q.g+1
                     temp.compute_h_f(goal)
 
                     if temp.parent_f == float('inf') or temp.parent_f > temp.f:
-                        temp.parent_f = temp.f
+                        temp.parent_f=temp.f
                         temp.set_parent(q)
                         OpenList.put(temp)
 
     if found_goal == False:
-        print('-1')
+        outfile.write('-1')
 
+if __name__ == '__main__':
+    with open(sys.argv[1]) as f:
+        N=int(next(f))
+        start_x, start_y=[int(x)for x in next(f).split()]
+        goal_x, goal_y=[int(x)for x in next(f).split()]
+        grid=[[int(x)for x in line.split()]for line in f]
 
-a_star_search(grid, start, goal)
+    start=Cell(start_x, start_y)
+    goal=Cell(goal_x, goal_y)
+
+    outfile=open(sys.argv[2], 'w')
+
+    a_star_search(outfile, grid, N, start, goal)
