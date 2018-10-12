@@ -21,7 +21,7 @@ class Cell:
 
     def __lt__(self, other):
         return self.f < other.f
-
+        
 
 N = 7
 grid = [[0 for x in range(N)] for y in range(N)]
@@ -59,8 +59,8 @@ def a_star_search(grid, start, goal):
         q = OpenList.get()
         ClosedList[q.x][q.y] = True
 
-        sx = [-1, 0, 1, 1, 1, 0, -1, -1]
-        sy = [-1, -1, -1, 0, 1, 1, 1, 0]
+        sx = [-1, -1, -1, 0, 1, 1, 1, 0]
+        sy = [-1, 0, 1, 1, 1, 0, -1, -1]
 
         for i in range(8):
             # Check if this successor is in bounds
@@ -101,7 +101,7 @@ def a_star_search(grid, start, goal):
 
                     return
 
-                elif (ClosedList[temp.x][temp.y] == False) & grid[temp.x][temp.y] == 0:
+                elif (ClosedList[temp.x][temp.y] == False) & (grid[temp.x][temp.y] == 0):
                     temp.g = q.g+1
                     temp.compute_h_f(goal)
 
@@ -110,7 +110,7 @@ def a_star_search(grid, start, goal):
                         temp.set_parent(q)
                         OpenList.put(temp)
 
-    if(found_goal == False):
+    if found_goal == False:
         print('-1')
 
 
