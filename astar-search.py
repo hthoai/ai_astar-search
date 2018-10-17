@@ -4,7 +4,30 @@ from math import sqrt
 
 
 class Cell:
+    """
+    Represents a position in map.
+
+    A cell has X Y coordinates, its parent cell and some function's values.
+    The coordinates of the top-left one is (0, 0).
+    """
+
     def __init__(self, x=0, y=0, g=0.0, h=0.0, f=0.0, parent=None, parent_f=float('inf')):
+        """
+        Initialize a new cell with the given arguments.
+
+        The new cell will automatically be assigned as above,
+        with a parent_f attribute of positive infinity float.
+
+        Arguments:
+        x: The cell's x position.
+        y: The cell's y position.
+        g: The cost to move from the start cell to this cell.
+        h: Heuristic - a function that estimates how close a cell is to the goal
+        (use Euclidean distance).
+        f: The cost to move from the start cell to this cell &
+        the estimated cost to move from this cell to the goal (f = g+h).
+        parent: Its parent cell - from that it's expanded.
+        """
         self.x = x
         self.y = y
         self.g = g
@@ -14,51 +37,71 @@ class Cell:
         self.parent_f = parent_f
 
     def set_parent(self, parent):
+        """Set parent for this cell."""
         self.parent = parent
 
     def compute_h_f(self, goal):
+        """Compute h & f function, use Euclidean distance"""
         self.h = sqrt((goal.x-self.x)**2+(goal.y-self.y)**2)
         self.f = self.g+self.h
 
     def __lt__(self, other):
+        """A cell with less f is  prioritized"""
         return self.f < other.f
 
 
-def is_in_bounds(row, col, N):
-    return (row >= 0) & (row < N) & (col >= 0) & (col < N)
+def is_in_bounds(successor, N):
+    """Check if a successor is in bounds"""
+    (row, col) = neighbour
+    return (row >= 0) and (row < N) and (col >= 0) and (col < N)
 
 
 def is_destination(row, col, goal):
-    return row == goal.x & col == goal.y
+    """Check if a cell is goal"""
+    return row == goal.x and col == goal.y
 
 
 def a_star_search(outfile, grid, N, start, goal):
-    # Create a closed list and initialise it to false
+    """
+    Implement A* search algorithm.
+
+    At each step it picks the neighbour cell having the lowest f,
+    and process that cell.
+
+    Arguments:
+    outfile: The file to write result in.
+    grid: A 2D matrix includes the status of each cell
+    (it is free or obstacle).
+    N: The number of row/col in grid (row = col).
+    start: The start cell.
+    goal: The goal cell.
+    """
+    # Create a closed list and initialize it to false
     # which means that no cell has been included yet
-    ClosedList = [[False for x in range(N)] for y in range(N)]
-    OpenList = PriorityQueue()
-    OpenList.put(start)
+    closed_list = [[False for x in range(N)] for y in range(N)]
+    open_list = PriorityQueue()
+    open_list.put(start)
     found_goal = False
 
-    while not OpenList.empty():
-        q = OpenList.get()
-        ClosedList[q.x][q.y] = True
+    while not open_list.empty():
+        q = open_list.get()
+        closed_list[q.x][q.y] = True
 
-        sx = [-1, -1, -1, 0, 1, 1, 1, 0]
-        sy = [-1, 0, 1, 1, 1, 0, -1, -1]
+        # Coordinates of 8-successors of a cell
+        successors = [(q.x-1, q.y-1), (q.x, q.y-1), (q.x+1, q.y - 1), (q.x+1, q.y),
+                      (q.x+1, q.y+1), (q.x, q.y+1), (q.x-1, q.y+1), (q.x-1, q.y)]
 
-        for i in range(8):
+        for successor in successors:
             # Check if this successor is in bounds
-            if is_in_bounds(q.x+sx[i], q.y+sy[i], N) == True:
-                temp = Cell(q.x+sx[i], q.y+sy[i])
+            if is_in_bounds(successor, N) == True:
+                temp = Cell(successor[0], successor[1])
 
                 # Check if this successor is destination
                 if is_destination(temp.x, temp.y, goal) == True:
                     temp.set_parent(q)
                     found_goal = True
 
-                    u = goal.x
-                    v = goal.y
+                    u, v = goal.x, goal.y
                     road = []
                     maps = [['-' for x in range(N)]for y in range(N)]
 
@@ -67,21 +110,22 @@ def a_star_search(outfile, grid, N, start, goal):
                             if (grid[i][j] == 1):
                                 maps[i][j] = 'o'
 
+                    # Trace back to find the road from start to goal
                     while (u != start.x or v != start.y):
-                        t = (u, v)
+                        point = (u, v)
                         temp = temp.parent
-                        road.append(t)
+                        road.append(point)
                         u = temp.x
                         v = temp.y
-                    t = (start.x, start.y)
-                    road.append(t)
+                    point = (start.x, start.y)
+                    road.append(point)
 
                     outfile.write('%d\n' % len(road))
 
                     for i in range(len(road)):
-                        t = road.pop()
-                        maps[t[0]][t[1]] = 'x'
-                        outfile.write('(%d, %d) ' % (t[0], t[1]))
+                        (x, y) = road.pop()
+                        maps[x][y] = 'x'
+                        outfile.write('(%d, %d) ' % (x, y))
                     outfile.write('\n')
 
                     maps[start.x][start.y] = 'S'
@@ -94,25 +138,29 @@ def a_star_search(outfile, grid, N, start, goal):
 
                     return
 
-                elif (ClosedList[temp.x][temp.y] == False) and (grid[temp.x][temp.y] == 0):
+                # The successor is not in Close List & not an obstacle
+                elif (closed_list[temp.x][temp.y] == False) and (grid[temp.x][temp.y] == 0):
                     temp.g = q.g+1
                     temp.compute_h_f(goal)
 
                     if temp.parent_f == float('inf') or temp.parent_f > temp.f:
                         temp.parent_f = temp.f
                         temp.set_parent(q)
-                        OpenList.put(temp)
+                        open_list.put(temp)
 
     if found_goal == False:
         outfile.write('-1')
+
+    outfile.close()
 
 
 if __name__ == '__main__':
     with open(sys.argv[1]) as f:
         N = int(next(f))
-        start_x, start_y = [int(x)for x in next(f).split()]
-        goal_x, goal_y = [int(x)for x in next(f).split()]
+        start_x, start_y = map(int, next(f).split())
+        goal_x, goal_y = map(int, next(f).split())
         grid = [[int(x)for x in line.split()]for line in f]
+        f.close()
 
     start = Cell(start_x, start_y)
     goal = Cell(goal_x, goal_y)
