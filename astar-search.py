@@ -52,7 +52,7 @@ class Cell:
 
 def is_in_bounds(successor, N):
     """Check if a successor is in bounds"""
-    (row, col) = neighbour
+    (row, col) = successor
     return (row >= 0) and (row < N) and (col >= 0) and (col < N)
 
 
