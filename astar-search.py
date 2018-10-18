@@ -141,8 +141,8 @@ def a_star_search(outfile, grid, N, start, goal):
                 elif (closed_list[temp.x][temp.y] == False) and (grid[temp.x][temp.y] == 0):
                     temp.g = q.g+1
                     temp.compute_h_f(goal)
-                    # If `temp.parent` did not set, we set parent for it
-                    # or `temp.parent.f` is larger than `temp.f`, we update new parent
+                    # If `temp.parent` did not set, set parent for it
+                    # or `temp.parent.f` is larger than `temp.f`, update new parent
                     # with less value of f
                     if temp.parent == None or temp.parent.f > temp.f:
                         temp.set_parent(q)
