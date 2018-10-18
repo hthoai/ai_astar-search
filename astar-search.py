@@ -152,8 +152,6 @@ def a_star_search(outfile, grid, N, start, goal):
     if found_goal == False:
         outfile.write('-1')
 
-    outfile.close()
-
 
 if __name__ == '__main__':
     with open(sys.argv[1]) as f:
@@ -169,3 +167,5 @@ if __name__ == '__main__':
     outfile = open(sys.argv[2], 'w')
 
     a_star_search(outfile, grid, N, start, goal)
+
+    outfile.close()
