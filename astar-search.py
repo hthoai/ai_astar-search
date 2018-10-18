@@ -9,24 +9,24 @@ class Cell:
 
     A cell has X Y coordinates, its parent cell and some function's values.
     The coordinates of the top-left one is (0, 0).
+
+    Attributes:
+    x: The cell's x position.
+    y: The cell's y position.
+    g: The cost to move from the start cell to this cell.
+    h: Heuristic - a function that estimates how close a cell is to the goal
+    (use Euclidean distance).
+    f: The cost to move from the start cell to this cell &
+    the estimated cost to move from this cell to the goal (f = g+h).
+    parent: Its parent cell - from that it's expanded.
     """
 
-    def __init__(self, x=0, y=0, g=0.0, h=0.0, f=0.0, parent=None, parent_f=float('inf')):
+    def __init__(self, x=0, y=0, g=0.0, h=0.0, f=float('inf'), parent=None):
         """
         Initialize a new cell with the given arguments.
 
         The new cell will automatically be assigned as above,
-        with a parent_f attribute of positive infinity float.
-
-        Arguments:
-        x: The cell's x position.
-        y: The cell's y position.
-        g: The cost to move from the start cell to this cell.
-        h: Heuristic - a function that estimates how close a cell is to the goal
-        (use Euclidean distance).
-        f: The cost to move from the start cell to this cell &
-        the estimated cost to move from this cell to the goal (f = g+h).
-        parent: Its parent cell - from that it's expanded.
+        with a f attribute of positive infinity float.
         """
         self.x = x
         self.y = y
@@ -34,30 +34,29 @@ class Cell:
         self.h = h
         self.f = f
         self.parent = parent
-        self.parent_f = parent_f
 
     def set_parent(self, parent):
         """Set parent for this cell."""
         self.parent = parent
 
     def compute_h_f(self, goal):
-        """Compute h & f function, use Euclidean distance"""
+        """Compute h & f function, use Euclidean distance."""
         self.h = sqrt((goal.x-self.x)**2+(goal.y-self.y)**2)
         self.f = self.g+self.h
 
     def __lt__(self, other):
-        """A cell with less f is  prioritized"""
+        """A cell with less f is  prioritized."""
         return self.f < other.f
 
 
 def is_in_bounds(successor, N):
-    """Check if a successor is in bounds"""
+    """Check if a successor is in bounds."""
     (row, col) = successor
     return (row >= 0) and (row < N) and (col >= 0) and (col < N)
 
 
-def is_destination(row, col, goal):
-    """Check if a cell is goal"""
+def is_goal(row, col, goal):
+    """Check if a cell is goal."""
     return row == goal.x and col == goal.y
 
 
@@ -96,8 +95,8 @@ def a_star_search(outfile, grid, N, start, goal):
             if is_in_bounds(successor, N) == True:
                 temp = Cell(successor[0], successor[1])
 
-                # Check if this successor is destination
-                if is_destination(temp.x, temp.y, goal) == True:
+                # Check if this successor is goal
+                if is_goal(temp.x, temp.y, goal) == True:
                     temp.set_parent(q)
                     found_goal = True
 
@@ -138,14 +137,16 @@ def a_star_search(outfile, grid, N, start, goal):
 
                     return
 
-                # The successor is not in Close List & not an obstacle
+                # Case the successor is not in Close List & not an obstacle
                 elif (closed_list[temp.x][temp.y] == False) and (grid[temp.x][temp.y] == 0):
                     temp.g = q.g+1
                     temp.compute_h_f(goal)
-
-                    if temp.parent_f == float('inf') or temp.parent_f > temp.f:
-                        temp.parent_f = temp.f
+                    # If `temp.parent` did not set, we set parent for it
+                    # or `temp.parent.f` is larger than `temp.f`, we update new parent
+                    # with less value of f
+                    if temp.parent == None or temp.parent.f > temp.f:
                         temp.set_parent(q)
+                        temp.parent.f = temp.f
                         open_list.put(temp)
 
     if found_goal == False:
