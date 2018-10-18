@@ -2,4 +2,4 @@
 ## Project 1: A* Search Algorithm
 
 ### How to run:
-`python3 astar-search.py infile_path outfile_path`
+`astar-search.py infile_path outfile_path`
