@@ -1,6 +1,6 @@
 import sys
 #from queue import PriorityQueue
-from MyQueue import PriorityQueue
+from my_queue import PriorityQueue
 from math import sqrt
 import time
 

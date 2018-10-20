@@ -1,5 +1,5 @@
 import sys
-from queue import PriorityQueue
+from my_queue import PriorityQueue
 from math import sqrt
 
 
@@ -49,7 +49,7 @@ def is_goal(row, col, goal):
     return row == goal.x and col == goal.y
 
 
-def a_star_search(outfile, grid, n, start, goal):
+def astar_search(outfile, grid, n, start, goal):
     """
     Implement A* search algorithm.
 
@@ -134,7 +134,7 @@ def a_star_search(outfile, grid, n, start, goal):
                     p.compute_h_f(goal)
                     # If p's parent did not set, set parent for it
                     # or f of p's parent is larger than f of p, update new parent
-                    # with less value of f - q
+                    # with less value of f — q
                     if (parent[p.x][p.y][2] == float('inf')) or (parent[p.x][p.y][2] > p.f):
                         parent[p.x][p.y] = q.x, q.y, p.f
                         open_list.put(p)
@@ -156,6 +156,6 @@ if __name__ == '__main__':
 
     outfile = open(sys.argv[2], 'w')
 
-    a_star_search(outfile, grid, n, start, goal)
+    astar_search(outfile, grid, n, start, goal)
 
     outfile.close()
