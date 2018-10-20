@@ -20,9 +20,11 @@ class Cell:
     the estimated cost to move from this cell to the goal (f = g+h).
     parent: Its parent cell - from that it's expanded.
     """
+
     def __init__(self, x=0, y=0, g=0.0, h=0.0, f=float('inf'), parent=None):
         """
         Initialize a new cell with the given arguments.
+
         The new cell will automatically be assigned as above,
         with a f attribute of positive infinity float.
         """
@@ -47,8 +49,9 @@ class Cell:
         return self.f < other.f
 
 
-def is_in_bounds(row, col, N):
+def is_in_bounds(successor, N):
     """Check if a successor is in bounds."""
+    (row, col) = successor
     return (row >= 0) and (row < N) and (col >= 0) and (col < N)
 
 
@@ -63,7 +66,7 @@ def a_star_search(outfile, grid, N, start, goal):
 
     At each step it picks the neighbour cell having the lowest f,
     and process that cell.
-    
+
     Arguments:
     outfile: The file to write result in.
     grid: A 2D matrix includes the status of each cell
@@ -72,11 +75,6 @@ def a_star_search(outfile, grid, N, start, goal):
     start: The start cell.
     goal: The goal cell.
     """
-    # Check if start, goal are in bounds and not obstacles.
-    if (not is_in_bounds(start.x, start.y, N)) or (not is_in_bounds(goal.x, goal.y, N)) or (grid[start.x][start.y] == 1) or (grid[goal.x][goal.y] == 1):
-        outfile.write('-1')
-        return
-
     # Create a closed list and initialize it to false
     # which means that no cell has been included yet
     closed_list = [[False for x in range(N)] for y in range(N)]
@@ -88,55 +86,65 @@ def a_star_search(outfile, grid, N, start, goal):
         q = open_list.get()
         closed_list[q.x][q.y] = True
 
-        if (q.x == goal.x) and (q.y == goal.y):
-            found_goal = True
-            road = []
-            road.append((goal.x, goal.y))
-            maps = [['-' for x in range(N)]for y in range(N)]
-
-            for i in range(N):
-                for j in range(N):
-                    if (grid[i][j] == 1):
-                        maps[i][j] = 'o'
-
-            # Trace back to find the road from start to goal
-            while (q.x != start.x or q.y != start.y):
-                q = q.parent
-                road.append((q.x, q.y))
-
-            outfile.write('%d\n' % len(road))
-
-            for i in range(len(road)):
-                (x, y) = road.pop()
-                maps[x][y] = 'x'
-                outfile.write('(%d, %d) ' % (x, y))
-
-            maps[start.x][start.y] = 'S'
-            maps[goal.x][goal.y] = 'G'
-
-            for i in range(N):
-                outfile.write('\n')
-                for j in range(N):
-                    outfile.write('%c ' % maps[i][j])
-
-            return
-
         # Coordinates of 8-successors of a cell
-        successors = [(q.x-1, q.y-1), (q.x-1, q.y), (q.x-1, q.y+1), (q.x, q.y+1),
-                      (q.x+1, q.y+1), (q.x+1, q.y), (q.x-1, q.y-1), (q.x, q.y)]
+        successors = [(q.x-1, q.y-1), (q.x, q.y-1), (q.x+1, q.y - 1), (q.x+1, q.y),
+                      (q.x+1, q.y+1), (q.x, q.y+1), (q.x-1, q.y+1), (q.x-1, q.y)]
 
         for successor in successors:
             # Check if this successor is in bounds
-            if is_in_bounds(successor[0], successor[1], N) == True:
+            if is_in_bounds(successor, N) == True:
                 temp = Cell(successor[0], successor[1])
+
+                # Check if this successor is goal
+                if is_goal(temp.x, temp.y, goal) == True:
+                    temp.set_parent(q)
+                    found_goal = True
+
+                    u, v = goal.x, goal.y
+                    road = []
+                    maps = [['-' for x in range(N)]for y in range(N)]
+
+                    for i in range(N):
+                        for j in range(N):
+                            if (grid[i][j] == 1):
+                                maps[i][j] = 'o'
+
+                    # Trace back to find the road from start to goal
+                    while (u != start.x or v != start.y):
+                        point = (u, v)
+                        temp = temp.parent
+                        road.append(point)
+                        u = temp.x
+                        v = temp.y
+                    point = (start.x, start.y)
+                    road.append(point)
+
+                    outfile.write('%d\n' % len(road))
+
+                    for i in range(len(road)):
+                        (x, y) = road.pop()
+                        maps[x][y] = 'x'
+                        outfile.write('(%d, %d) ' % (x, y))
+                    outfile.write('\n')
+
+                    maps[start.x][start.y] = 'S'
+                    maps[goal.x][goal.y] = 'G'
+
+                    for i in range(N):
+                        for j in range(N):
+                            outfile.write('%c ' % maps[i][j])
+                        outfile.write('\n')
+
+                    return
+
                 # Case the successor is not in Close List & not an obstacle
-                if (closed_list[temp.x][temp.y] == False) and (grid[temp.x][temp.y] == 0):
-                    temp.g = q.g+1.0
+                elif (closed_list[temp.x][temp.y] == False) and (grid[temp.x][temp.y] == 0):
+                    temp.g = q.g+1
                     temp.compute_h_f(goal)
                     # If `temp.parent` did not set, set parent for it
                     # or `temp.parent.f` is larger than `temp.f`, update new parent
                     # with less value of f
-                    if (temp.parent == None) or (temp.parent.f > temp.f):
+                    if temp.parent == None or temp.parent.f > temp.f:
                         temp.set_parent(q)
                         temp.parent.f = temp.f
                         open_list.put(temp)
