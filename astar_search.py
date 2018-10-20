@@ -24,6 +24,7 @@ class Cell:
     def __init__(self, x=0, y=0, g=0.0, h=0.0, f=float('inf')):
         """
         Initialize a new cell with the given arguments.
+        
         The new cell will automatically be assigned as above,
         with a f attribute of positive infinity float.
         """
