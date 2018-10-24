@@ -36,7 +36,7 @@ class Cell:
         self.f = self.g+self.h
 
     def __lt__(self, other):
-        """A cell with less f is  prioritized."""
+        """Less than operator."""
         return self.f < other.f
 
 
